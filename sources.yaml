@@ -1,0 +1,259 @@
+sources:
+  - name: step_tbesg
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/STEPBible/STEPBible-Data/master/Lexicons/TBESG%20-%20Translators%20Brief%20lexicon%20of%20Extended%20Strongs%20for%20Greek%20-%20STEPBible.org%20CC%20BY.txt
+    license: CC-BY-4.0 (STEPBible Data)
+    dest: .cache/sources/step/TBESG_Greek.txt
+  - name: step_tbesh
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/STEPBible/STEPBible-Data/master/Lexicons/TBESH%20-%20Translators%20Brief%20lexicon%20of%20Extended%20Strongs%20for%20Hebrew%20-%20STEPBible.org%20CC%20BY.txt
+    license: CC-BY-4.0 (STEPBible Data)
+    dest: .cache/sources/step/TBESH_Hebrew.txt
+  - name: tr1894_john_parsed
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/byztxt/greektext-textus-receptus/master/parsed/JOH.UTR
+    license: Public Domain (Robinson TR Parsed)
+    dest: .cache/sources/tr/JOH.UTR
+  - name: tr1894_matthew_parsed
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/byztxt/greektext-textus-receptus/master/parsed/MT.UTR
+    license: Public Domain (Robinson TR Parsed)
+    dest: .cache/sources/tr/MT.UTR
+  - name: oshb_genesis
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Gen.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Gen.xml
+  - name: oshb_exodus
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Exod.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Exod.xml
+  - name: oshb_leviticus
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Lev.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Lev.xml
+  - name: oshb_numbers
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Num.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Num.xml
+  - name: oshb_deuteronomy
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Deut.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Deut.xml
+  - name: oshb_joshua
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Josh.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Josh.xml
+  - name: oshb_judges
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Judg.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Judg.xml
+  - name: oshb_ruth
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Ruth.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Ruth.xml
+  - name: oshb_1samuel
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/1Sam.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/1Sam.xml
+  - name: oshb_2samuel
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/2Sam.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/2Sam.xml
+  - name: oshb_1kings
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/1Kgs.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/1Kgs.xml
+  - name: oshb_2kings
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/2Kgs.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/2Kgs.xml
+  - name: oshb_1chronicles
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/1Chr.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/1Chr.xml
+  - name: oshb_2chronicles
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/2Chr.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/2Chr.xml
+  - name: oshb_ezra
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Ezra.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Ezra.xml
+  - name: oshb_nehemiah
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Neh.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Neh.xml
+  - name: oshb_esther
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Esth.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Esth.xml
+  - name: oshb_job
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Job.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Job.xml
+  - name: oshb_psalms
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Ps.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Ps.xml
+  - name: oshb_proverbs
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Prov.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Prov.xml
+  - name: oshb_ecclesiastes
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Eccl.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Eccl.xml
+  - name: oshb_songofsongs
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Song.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Song.xml
+  - name: oshb_isaiah
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Isa.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Isa.xml
+  - name: oshb_jeremiah
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Jer.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Jer.xml
+  - name: oshb_lamentations
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Lam.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Lam.xml
+  - name: oshb_ezekiel
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Ezek.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Ezek.xml
+  - name: oshb_daniel
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Dan.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Dan.xml
+  - name: oshb_hosea
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Hos.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Hos.xml
+  - name: oshb_joel
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Joel.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Joel.xml
+  - name: oshb_amos
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Amos.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Amos.xml
+  - name: oshb_obadiah
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Obad.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Obad.xml
+  - name: oshb_jonah
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Jonah.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Jonah.xml
+  - name: oshb_micah
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Mic.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Mic.xml
+  - name: oshb_nahum
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Nah.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Nah.xml
+  - name: oshb_habakkuk
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Hab.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Hab.xml
+  - name: oshb_zephaniah
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Zeph.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Zeph.xml
+  - name: oshb_haggai
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Hag.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Hag.xml
+  - name: oshb_zechariah
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Zech.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Zech.xml
+  - name: oshb_malachi
+    kind: file
+    ref: master
+    url: https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Mal.xml
+    license: CC-BY-4.0 (OSHB; WLC is Public Domain)
+    dest: .cache/sources/oshb/wlc/Mal.xml

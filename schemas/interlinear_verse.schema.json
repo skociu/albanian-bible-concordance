@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Interlinear Chapter",
+  "type": "object",
+  "required": ["ref", "verses", "_meta"],
+  "properties": {
+    "ref": {
+      "type": "object",
+      "required": ["book", "book_sq", "chapter"],
+      "properties": {
+        "book": {"type": "string"},
+        "book_sq": {"type": "string"},
+        "chapter": {"type": "integer", "minimum": 1}
+      }
+    },
+    "verses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["v", "sq", "src"],
+        "properties": {
+          "v": {"type": "integer", "minimum": 1},
+          "sq": {"type": "string"},
+          "src": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["i", "w", "l", "m", "t"],
+              "properties": {
+                "i": {"type": "integer", "minimum": 0},
+                "w": {"type": "string"},
+                "l": {"type": "string"},
+                "m": {"type": "string"},
+                "s": {"type": "string"},
+                "t": {"type": "string"}
+              }
+            }
+          },
+          "gloss": {
+            "type": "object",
+            "additionalProperties": {"type": "string"}
+          },
+          "align_phrase": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["src", "tgt"],
+              "properties": {
+                "src": {"type": "array", "items": {"type": "integer"}},
+                "tgt": {"type": "array", "items": {"type": "integer"}}
+              }
+            },
+            "default": []
+          }
+        }
+      }
+    },
+    "_meta": {
+      "type": "object",
+      "required": ["lang_src", "lang_tgt", "sources", "generated_at", "license_notes"],
+      "properties": {
+        "lang_src": {"type": "string"},
+        "lang_tgt": {"type": "string"},
+        "sources": {
+          "type": "object",
+          "properties": {
+            "text": {"type": "string"},
+            "morph": {"type": "string"},
+            "gloss": {"type": "string"}
+          },
+          "required": ["text", "morph"]
+        },
+        "generated_at": {"type": "string"},
+        "license_notes": {"type": "string"}
+      }
+    }
+  }
+}
+

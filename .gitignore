@@ -1,0 +1,49 @@
+# Python caches
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+pip-wheel-metadata/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors/IDEs
+.vscode/
+.idea/
+
+# Logs
+*.log
+web_ui.out.log
+web_ui.err.log
+
+# Local outputs that shouldn't be versioned
+exports/
+
+# Databases and local stores
+*.sqlite
+*.db
+*.db-shm
+*.db-wal
+
+# Build artifacts (general)
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Keep GitHub Pages docs/ tracked (do NOT ignore)
+.github/prompts
+

@@ -1,0 +1,83 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build SQLite DB
+        run: |
+          python scripts/build_concordance.py build --sql Alb.sql.txt --db alb_concordance.sqlite
+
+      - name: Build site data
+        run: |
+          python scripts/build_site_index.py --db alb_concordance.sqlite --out site --min-len 3
+      - name: Interlinear: fetch sources (TR 1894)
+        run: |
+          python scripts/fetch_sources.py
+      - name: Interlinear: build John 1 JSON (TR 1894)
+        run: |
+          python scripts/tr_to_json.py
+          python scripts/build_interlinear.py --input .cache/build/tr/john/1.json --output site/data/john/1.json
+      - name: Interlinear: validate schema (TR 1894)
+        run: |
+          python scripts/validate_schema.py site/data/john/1.json
+      - name: Interlinear: build Genesis 1 JSON (OSHB)
+        run: |
+          python scripts/oshb_to_json.py --book Gen --chapter 1
+          python scripts/build_interlinear.py --input .cache/build/ot/genesis/1.json --output site/data/genesis/1.json
+      - name: Interlinear: validate schema (OSHB)
+        run: |
+          python scripts/validate_schema.py site/data/genesis/1.json
+      - name: Lint (placeholder)
+        run: |
+          npm run lint
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

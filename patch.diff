@@ -1,0 +1,36 @@
+﻿*** Begin Patch
+*** Update File: scripts/tr_to_json.py
+@@
+-BOOK_MAP = {}\n\n\n-def main():
++BOOK_MAP = {
++    'MT':  {'slug': 'matthew',       'book': 'Matthew (TR1894)',    'book_sq': 'Mateu',                'file': 'MT.UTR'},
++    'MR':  {'slug': 'mark',          'book': 'Mark (TR1894)',       'book_sq': 'Marku',                'file': 'MR.UTR'},
++    'LU':  {'slug': 'luke',          'book': 'Luke (TR1894)',       'book_sq': 'Luka',                 'file': 'LU.UTR'},
++    'JOH': {'slug': 'john',          'book': 'John (TR1894)',       'book_sq': 'Gjoni',                'file': 'JOH.UTR'},
++    'ACT': {'slug': 'acts',          'book': 'Acts (TR1894)',       'book_sq': 'Veprat e Apostujve',   'file': 'ACT.UTR'},
++    'ROM': {'slug': 'romans',        'book': 'Romans (TR1894)',     'book_sq': 'Romakëve',             'file': 'ROM.UTR'},
++    '1CO': {'slug': '1corinthians',  'book': '1 Corinthians (TR1894)','book_sq': '1 Korintasve',       'file': '1CO.UTR'},
++    '2CO': {'slug': '2corinthians',  'book': '2 Corinthians (TR1894)','book_sq': '2 Korintasve',       'file': '2CO.UTR'},
++    'GAL': {'slug': 'galatians',     'book': 'Galatians (TR1894)',  'book_sq': 'Galatasve',            'file': 'GAL.UTR'},
++    'EPH': {'slug': 'ephesians',     'book': 'Ephesians (TR1894)',  'book_sq': 'Efesianëve',           'file': 'EPH.UTR'},
++    'PHP': {'slug': 'philippians',   'book': 'Philippians (TR1894)','book_sq': 'Filipianëve',          'file': 'PHP.UTR'},
++    'COL': {'slug': 'colossians',    'book': 'Colossians (TR1894)', 'book_sq': 'Kolosianëve',          'file': 'COL.UTR'},
++    '1TH': {'slug': '1thessalonians','book': '1 Thessalonians (TR1894)','book_sq':'1 Thesalonikasve',  'file': '1TH.UTR'},
++    '2TH': {'slug': '2thessalonians','book': '2 Thessalonians (TR1894)','book_sq':'2 Thesalonikasve',  'file': '2TH.UTR'},
++    '1TI': {'slug': '1timothy',      'book': '1 Timothy (TR1894)',  'book_sq': '1 Timoteut',           'file': '1TI.UTR'},
++    '2TI': {'slug': '2timothy',      'book': '2 Timothy (TR1894)',  'book_sq': '2 Timoteut',           'file': '2TI.UTR'},
++    'TIT': {'slug': 'titus',         'book': 'Titus (TR1894)',      'book_sq': 'Titit',                'file': 'TIT.UTR'},
++    'PHM': {'slug': 'philemon',      'book': 'Philemon (TR1894)',   'book_sq': 'Filemonit',            'file': 'PHM.UTR'},
++    'HEB': {'slug': 'hebrews',       'book': 'Hebrews (TR1894)',    'book_sq': 'Hebrenjve',            'file': 'HEB.UTR'},
++    'JAS': {'slug': 'james',         'book': 'James (TR1894)',      'book_sq': 'Jakobi',               'file': 'JAS.UTR'},
++    '1PE': {'slug': '1peter',        'book': '1 Peter (TR1894)',    'book_sq': '1 Pjetrit',            'file': '1PE.UTR'},
++    '2PE': {'slug': '2peter',        'book': '2 Peter (TR1894)',    'book_sq': '2 Pjetrit',            'file': '2PE.UTR'},
++    '1JO': {'slug': '1john',         'book': '1 John (TR1894)',     'book_sq': '1 Gjonit',             'file': '1JO.UTR'},
++    '2JO': {'slug': '2john',         'book': '2 John (TR1894)',     'book_sq': '2 Gjonit',             'file': '2JO.UTR'},
++    '3JO': {'slug': '3john',         'book': '3 John (TR1894)',     'book_sq': '3 Gjonit',             'file': '3JO.UTR'},
++    'JUD': {'slug': 'jude',          'book': 'Jude (TR1894)',       'book_sq': 'Juda',                 'file': 'JUD.UTR'},
++    'REV': {'slug': 'revelation',    'book': 'Revelation (TR1894)', 'book_sq': 'Zbulesa e Gjonit',     'file': 'REV.UTR'},
++}
++
++def main():
+*** End Patch

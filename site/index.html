@@ -1,0 +1,60 @@
+﻿<!doctype html>
+<meta charset="utf-8">
+<title>Konkordanca e Bibles Shqiptare</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="assets/css/interlinear.css">
+<div id="app">
+  <header>
+    <div class="brand">
+      <h1>Konkordanca e Bibles Shqiptare</h1>
+    </div>
+    <nav>
+      <a href="#" id="nav-home">Kerko</a>
+      <a href="#" id="nav-browse">Bibla Shqip</a>
+      <a href="#" id="nav-about">Info</a>
+    </nav>
+  </header>
+
+  <section id="search">
+    <div class="intro-row">
+      <div class="intro-left">
+        <img class="hero-image" src="images/albanian-concordance-image.jpg" alt="Konkordanca e Bibles Shqiptare">
+      </div>
+      <div class="intro-right">
+        <form id="search-form">
+          <input type="text" id="q" placeholder="Kërko fjalën (p.sh. dashuri)" autocomplete="off">
+          <button type="submit">Kerko</button>
+          <button type="button" id="btn-print">Printo</button>
+          <button type="button" id="btn-download">Shkarko HTML</button>
+        </form>
+        <div id="hint" class="muted">K&euml;rkimi &euml;sht&euml; i pandjesh&euml;m ndaj thekseve (&euml; -&gt; e, &ccedil; -&gt; c). P&euml;rputhje t&euml; sakta t&euml; fjal&euml;ve.</div>
+        <div id="status" class="muted"></div>
+      </div>
+    </div>
+    <div id="results"></div>
+  </section>
+
+  <section id="browse" style="display:none">
+    <div id="browse-books" class="books"></div>
+    <div id="browse-chapters" class="chapters" style="display:none"></div>
+    <div id="browse-title" class="muted" style="display:none"></div>
+    <div id="browse-verses"></div>
+  </section>
+
+  <section id="about" style="display:none">
+    <p>Kjo është një konkordancë statike dhe falas, e ndërtuar me ndihmën e agjentëve AI dhe nga Alb.sql duke përdorur skedarë JSON në GitHub Pages. Nuk kërkohet server.</p>
+    <ul>
+      <li>Kërko sipas fjalës (token)</li>
+      <li>Thekso përputhjet në tekst</li>
+      <li>Pamje e përshtatshme për printim</li>
+    </ul>
+  </section>
+
+  <footer>
+    <span class="muted">Tekst në domenin publik. Ndërtuar për edukim dhe studim.</span>
+  </footer>
+</div>
+<script src="app.js?v=11"></script>
+<script src="assets/js/interlinear.js?v=5"></script>
+<script src="assets/js/app.js?v=3"></script>
+

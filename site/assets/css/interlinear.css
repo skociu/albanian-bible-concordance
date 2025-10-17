@@ -1,0 +1,50 @@
+﻿/* Minimal interlinear styles */
+.il-toggle { margin: .5rem 0; }
+.il-verse { margin-bottom: .5rem; }
+.il-ref { font-weight: 600; margin: .45rem 0 .4rem; color: #374151; direction: ltr; unicode-bidi: isolate; padding: .25rem .6rem; display:inline-block; }
+.il-row { display: flex; flex-wrap: wrap; gap: .25rem .5rem; }
+.il-row-a { font-family: 'Noto Serif', serif; font-size: 1.05rem; line-height: 1.6; }
+.il-row-a[dir="rtl"], [dir="rtl"] .il-row-a { direction: rtl; unicode-bidi: isolate; display:flex; flex-direction: row; justify-content: flex-start; }
+.il-row-a[dir="rtl"] .il-cell, [dir="rtl"] .il-row-a .il-cell { direction: rtl; text-align: right; }
+.il-token-col.il-heb .mid-word { direction: rtl; text-align: right; }
+[dir="rtl"] .il-row-b { direction: ltr; }
+[dir="rtl"] .il-row-c { direction: ltr; }
+.il-row-b { color: #555; font-size: .85rem; display: none; }
+.il-row-c { margin-top: .2rem; }
+.il-cell.token:focus-within, .il-cell.token:focus { outline: 2px solid #3b82f6; outline-offset: 2px; }
+.il-cell.meta { white-space: nowrap; }
+.il-cell.sq { white-space: normal; }
+@media (min-width: 768px){
+  .il-row-b { display: flex; }
+}
+
+/* Stacked token layout for Hebrew */
+.il-token-col { display: inline-flex; flex-direction: column; align-items: center; text-align: center; margin-inline: .5rem; }
+.il-token-col .top-strong { color: #0ea5e9; font-size: .72rem; line-height: 1.1; }
+.il-token-col .mid-word { font-size: 1.4rem; line-height: 1.6; color: #111827; }
+
+/* Greek stacked variant */
+.il-token-col.il-gr .top-strong { color: #2563eb; }
+.il-token-col.il-gr .top-translit { display:none; }
+.il-token-col.il-gr .bot-gloss { display:none; }
+
+/* Inline interlinear placed inside search results */
+.il-inline{ margin: .25rem 0 .75rem; }
+
+/* Icon-only copy button (Option A) */
+.copy-btn{ display:inline-flex; align-items:center; gap:.35rem; margin-left:.5rem; padding:.18rem .42rem; border:1px solid #d1d5db; border-radius:.375rem; background:#fff; color:#111827; line-height:1; cursor:pointer; min-width:0 !important; height:auto !important; flex:0 0 auto; }
+.copy-btn:hover{ background:#f9fafb; }
+.copy-btn.copied{ border-color:#34d399; color:#065f46; background:#ecfdf5; }
+.copy-btn .copy-ic{ width:16px; height:16px; display:inline-block; vertical-align:-1px; flex:0 0 auto; }
+
+/* Variant: Albanian copy button */
+.copy-btn.copy-sq{ border-color:#93c5fd; color:#1d4ed8; background:#eff6ff; }
+.copy-btn.copy-sq:hover{ background:#dbeafe; }
+.copy-btn.copy-sq.copied{ border-color:#60a5fa; color:#1e40af; background:#e0f2fe; }
+
+
+
+
+.copy-btn.copy-src{ border-color:#86efac; background:#ecfdf5; color:#166534; }
+.copy-btn.copy-src:hover{ background:#dcfce7; }
+.copy-btn.copy-src.copied{ border-color:#34d399; color:#065f46; background:#ecfdf5; }

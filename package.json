@@ -1,0 +1,13 @@
+{
+  "name": "albanian-bible-interlinear",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build:data": "python scripts/morphgnt_to_json.py && python scripts/build_interlinear.py",
+    "validate": "python scripts/validate_schema.py",
+    "fetch": "python scripts/fetch_sources.py",
+    "serve": "python -m http.server -d site 8080",
+    "lint": "echo 'No JS linter configured'"
+  }
+}
+

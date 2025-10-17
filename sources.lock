@@ -1,0 +1,349 @@
+{
+  "generated_at": "2025-10-15T03:19:56Z",
+  "sources": [
+    {
+      "name": "step_tbesg",
+      "url": "https://raw.githubusercontent.com/STEPBible/STEPBible-Data/master/Lexicons/TBESG%20-%20Translators%20Brief%20lexicon%20of%20Extended%20Strongs%20for%20Greek%20-%20STEPBible.org%20CC%20BY.txt",
+      "ref": "master",
+      "license": "CC-BY-4.0 (STEPBible Data)",
+      "sha256": "312f723d7b8ef263bbdfb0451c9b8057125804dfff390b6f8544cff2a84b57f4",
+      "dest": ".cache\\sources\\step\\TBESG_Greek.txt"
+    },
+    {
+      "name": "step_tbesh",
+      "url": "https://raw.githubusercontent.com/STEPBible/STEPBible-Data/master/Lexicons/TBESH%20-%20Translators%20Brief%20lexicon%20of%20Extended%20Strongs%20for%20Hebrew%20-%20STEPBible.org%20CC%20BY.txt",
+      "ref": "master",
+      "license": "CC-BY-4.0 (STEPBible Data)",
+      "sha256": "bdfdd17c1377aa5400618930fd0ea6f9a6f8d77ffdbbcd575b35d2d81c89401f",
+      "dest": ".cache\\sources\\step\\TBESH_Hebrew.txt"
+    },
+    {
+      "name": "tr1894_john_parsed",
+      "url": "https://raw.githubusercontent.com/byztxt/greektext-textus-receptus/master/parsed/JOH.UTR",
+      "ref": "master",
+      "license": "Public Domain (Robinson TR Parsed)",
+      "sha256": "77fbb830ae3e11b79f7f47a8e68a119dc77f0722ebcc99bb00111702797bffe5",
+      "dest": ".cache\\sources\\tr\\JOH.UTR"
+    },
+    {
+      "name": "tr1894_matthew_parsed",
+      "url": "https://raw.githubusercontent.com/byztxt/greektext-textus-receptus/master/parsed/MT.UTR",
+      "ref": "master",
+      "license": "Public Domain (Robinson TR Parsed)",
+      "sha256": "5aa69dc0f3119de714907e9279302e6bdada20f5c1c2f5a1fb0ed365be90dfe5",
+      "dest": ".cache\\sources\\tr\\MT.UTR"
+    },
+    {
+      "name": "oshb_genesis",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Gen.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "0526e5c9a5fb4d907847645f954ed3d1268fa69decbd872056cedd2668d86449",
+      "dest": ".cache\\sources\\oshb\\wlc\\Gen.xml"
+    },
+    {
+      "name": "oshb_exodus",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Exod.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "04868367cdacb6ccdc61488e923e20f918172042e6437842a0621f63ac5b847f",
+      "dest": ".cache\\sources\\oshb\\wlc\\Exod.xml"
+    },
+    {
+      "name": "oshb_leviticus",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Lev.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "e21e70265c9ef500182f8ccb4f4e1186e5a79e1169d24cef23cc479baf07b191",
+      "dest": ".cache\\sources\\oshb\\wlc\\Lev.xml"
+    },
+    {
+      "name": "oshb_numbers",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Num.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "02e4febfcc027d10b3e35e4f091eae67a40d26f37b6254faac6b4af053fe4896",
+      "dest": ".cache\\sources\\oshb\\wlc\\Num.xml"
+    },
+    {
+      "name": "oshb_deuteronomy",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Deut.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "04f8087442a1e67a631cd70f2ac4e42fe0a780ae132edb165a3a29f3f290358f",
+      "dest": ".cache\\sources\\oshb\\wlc\\Deut.xml"
+    },
+    {
+      "name": "oshb_joshua",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Josh.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "a066200ab2269c0a86a2e9ba119a3d0fce8c5f7ecc44bb53ec134b83dffc6006",
+      "dest": ".cache\\sources\\oshb\\wlc\\Josh.xml"
+    },
+    {
+      "name": "oshb_judges",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Judg.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "3b3a909f04041dbd52dc6b7293a96ce75d94db8a90fdeda878943db7b8fac57f",
+      "dest": ".cache\\sources\\oshb\\wlc\\Judg.xml"
+    },
+    {
+      "name": "oshb_ruth",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Ruth.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "fb6a2660383c7176941cb87b2be182ef634b66d49d057635869f4d9cb1f0a11e",
+      "dest": ".cache\\sources\\oshb\\wlc\\Ruth.xml"
+    },
+    {
+      "name": "oshb_1samuel",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/1Sam.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "960432732c22286b82d80b6b25af8d10dc5f2e82a4e5e48b2e3a1b1eea17f3cb",
+      "dest": ".cache\\sources\\oshb\\wlc\\1Sam.xml"
+    },
+    {
+      "name": "oshb_2samuel",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/2Sam.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "e7793e141ed94eadbd2dfb23936abbb4062e81a7dcd41114a6e36644f50b8333",
+      "dest": ".cache\\sources\\oshb\\wlc\\2Sam.xml"
+    },
+    {
+      "name": "oshb_1kings",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/1Kgs.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "832ba10f605dce34c4888ee0a795d91edc2b293391d6ae9c36c36c6350761a3e",
+      "dest": ".cache\\sources\\oshb\\wlc\\1Kgs.xml"
+    },
+    {
+      "name": "oshb_2kings",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/2Kgs.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "056db5393beaef0a1159d9bcaac7dfd865df9bab2eb240ea90e9fa3f0c0e7449",
+      "dest": ".cache\\sources\\oshb\\wlc\\2Kgs.xml"
+    },
+    {
+      "name": "oshb_1chronicles",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/1Chr.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "8b59992b6607c6ca0fc423813be8cc244f011c1da32bc8485c0c0f581a897ed4",
+      "dest": ".cache\\sources\\oshb\\wlc\\1Chr.xml"
+    },
+    {
+      "name": "oshb_2chronicles",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/2Chr.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "507294e8ca0fcf31ec25fe62fa24a7f2581f53116519bf08cfe96ff85e9c99fb",
+      "dest": ".cache\\sources\\oshb\\wlc\\2Chr.xml"
+    },
+    {
+      "name": "oshb_ezra",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Ezra.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "fb28ff697d0ee17eba5b4db47fb7261ee1870cea0d5701bfc77c9e28d4138129",
+      "dest": ".cache\\sources\\oshb\\wlc\\Ezra.xml"
+    },
+    {
+      "name": "oshb_nehemiah",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Neh.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "be082e95c206469122455b9849d4dd08da50c817732d8198c1beece90402801a",
+      "dest": ".cache\\sources\\oshb\\wlc\\Neh.xml"
+    },
+    {
+      "name": "oshb_esther",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Esth.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "f9b5b8adaf504dcac409bb6a27c9328967f47eeb4e920070cd53ef5301299019",
+      "dest": ".cache\\sources\\oshb\\wlc\\Esth.xml"
+    },
+    {
+      "name": "oshb_job",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Job.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "7db3311184122f37a8fd52f3c7c0c4a6d2da7b77ee82f4fdb26bcba9171d297f",
+      "dest": ".cache\\sources\\oshb\\wlc\\Job.xml"
+    },
+    {
+      "name": "oshb_psalms",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Ps.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "fe55eef316a65fb0f46d833d526ca2fd722e86ff7339f1a39f0c5b7f9062ced2",
+      "dest": ".cache\\sources\\oshb\\wlc\\Ps.xml"
+    },
+    {
+      "name": "oshb_proverbs",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Prov.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "964f99c00239b53b854c4686c99490c8d1ac7664784a30afdfc23781a3abb161",
+      "dest": ".cache\\sources\\oshb\\wlc\\Prov.xml"
+    },
+    {
+      "name": "oshb_ecclesiastes",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Eccl.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "2dfc858d19048f6479eca33b9fe781c2d7e9059e9ae3ab0b37b802d3afec02bb",
+      "dest": ".cache\\sources\\oshb\\wlc\\Eccl.xml"
+    },
+    {
+      "name": "oshb_songofsongs",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Song.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "5cd6ae36d32c059aaf794af5a5eaed914ac643486db3e412eb0b969760db82ca",
+      "dest": ".cache\\sources\\oshb\\wlc\\Song.xml"
+    },
+    {
+      "name": "oshb_isaiah",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Isa.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "0807678de609bdef284bed5400b94ddab570d101b593c7f59ae1939015572fa2",
+      "dest": ".cache\\sources\\oshb\\wlc\\Isa.xml"
+    },
+    {
+      "name": "oshb_jeremiah",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Jer.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "1a7ad7bc26a2cae1d3964230e8eb73043bc1f32505cb86cd69a25261dc39f493",
+      "dest": ".cache\\sources\\oshb\\wlc\\Jer.xml"
+    },
+    {
+      "name": "oshb_lamentations",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Lam.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "be68fc6a913313367280c2596e28733ee8cf877c12a65227237733b40d0248c4",
+      "dest": ".cache\\sources\\oshb\\wlc\\Lam.xml"
+    },
+    {
+      "name": "oshb_ezekiel",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Ezek.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "90bf8adfa66b2f6695c702263fe668755c99c6afc386202c12de4f704f5d4e46",
+      "dest": ".cache\\sources\\oshb\\wlc\\Ezek.xml"
+    },
+    {
+      "name": "oshb_daniel",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Dan.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "bc69d0fa9708dacb11ea6d587509250bf1bcc1b4343eac2d6e97f8b41518fc0d",
+      "dest": ".cache\\sources\\oshb\\wlc\\Dan.xml"
+    },
+    {
+      "name": "oshb_hosea",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Hos.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "f38ae44a3a97d142768bd5f4d40e77b69265184f9a5aec9e6af1b9b226e8daae",
+      "dest": ".cache\\sources\\oshb\\wlc\\Hos.xml"
+    },
+    {
+      "name": "oshb_joel",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Joel.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "c0fefc6881afe949b023968106cdccc05a690734b8bb6e9aa48914d77e5369af",
+      "dest": ".cache\\sources\\oshb\\wlc\\Joel.xml"
+    },
+    {
+      "name": "oshb_amos",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Amos.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "6ad94c6a18076762f1a458720c62156d354e5111ee25719b7792b70792d0084d",
+      "dest": ".cache\\sources\\oshb\\wlc\\Amos.xml"
+    },
+    {
+      "name": "oshb_obadiah",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Obad.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "1e893e552a7ed7e2e6d4048637ff5da8a2853a9e4432f4095cede80b959d850c",
+      "dest": ".cache\\sources\\oshb\\wlc\\Obad.xml"
+    },
+    {
+      "name": "oshb_jonah",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Jonah.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "1e1afcc3aaba1399d5c884ee106894c6bfca87c8c81fa57783ab75a923eee17d",
+      "dest": ".cache\\sources\\oshb\\wlc\\Jonah.xml"
+    },
+    {
+      "name": "oshb_micah",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Mic.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "267e111adc1b941e32444816af07aa136ecde02cb315cd42597f78b393e67a01",
+      "dest": ".cache\\sources\\oshb\\wlc\\Mic.xml"
+    },
+    {
+      "name": "oshb_nahum",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Nah.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "5993b28bdbee3c922e3e93002d343a655493e8bd45e3472f3b62d77beadcb62c",
+      "dest": ".cache\\sources\\oshb\\wlc\\Nah.xml"
+    },
+    {
+      "name": "oshb_habakkuk",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Hab.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "2592b212d816775adc8dac46bd0c46263982c308a186dde64dfb8239c57bd2d1",
+      "dest": ".cache\\sources\\oshb\\wlc\\Hab.xml"
+    },
+    {
+      "name": "oshb_zephaniah",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Zeph.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "eb5bd2a745fba1ffeed31dfafd834ce7c290929c992390be1a2b9451d22dea2e",
+      "dest": ".cache\\sources\\oshb\\wlc\\Zeph.xml"
+    },
+    {
+      "name": "oshb_haggai",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Hag.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "26ebbae4fe491cf89ce70e1264cbcbf66a562b497cb214b677e67a9a43ad545c",
+      "dest": ".cache\\sources\\oshb\\wlc\\Hag.xml"
+    },
+    {
+      "name": "oshb_zechariah",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Zech.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "2e287c8d0e0abd3bf601eb8ef9b4ee6ca3ae12cf36c0ed1612a7dcca54a2e777",
+      "dest": ".cache\\sources\\oshb\\wlc\\Zech.xml"
+    },
+    {
+      "name": "oshb_malachi",
+      "url": "https://raw.githubusercontent.com/openscriptures/morphhb/master/wlc/Mal.xml",
+      "ref": "master",
+      "license": "CC-BY-4.0 (OSHB; WLC is Public Domain)",
+      "sha256": "1583e6a701406dce7b8c2bf85e3522ec31383756de130685fc7c2eb6df8964b2",
+      "dest": ".cache\\sources\\oshb\\wlc\\Mal.xml"
+    }
+  ]
+}
