@@ -137,13 +137,24 @@
   }
 
   window.addEventListener('DOMContentLoaded', () => {
-    const footer = document.querySelector('footer .muted');
-    if (footer){
-      const span = document.createElement('span');
-      span.className = 'muted';
-      span.style.marginLeft = '1rem';
-      span.textContent = 'Interlinear: TR 1894 (Domen publik), OSHB (CC BY 4.0), TBESG (CC BY 4.0)';
-      footer.insertAdjacentElement('afterend', span);
+    const footerSpan = document.querySelector('footer .muted');
+    if (footerSpan){
+      // Keep footer text authoritative; no extra note needed
+      // If older text is present, normalize it to the latest wording
+      const want = 'Tekst në domenin publik (ALB – Scrollmapper). Ndërtuar për edukim dhe studim. Interlinear: TR 1894 (Domen publik), WLC (OSHB, CC BY 4.0), TBESG (CC BY 4.0).';
+      try {
+        const t = footerSpan.textContent || '';
+        if (!t.includes('ALB') || !t.includes('Interlinear')) footerSpan.textContent = want;
+      } catch(e){ footerSpan.textContent = want; }
+      // Remove any legacy appended interlinear spans right after the footer text
+      try {
+        let el = footerSpan.nextElementSibling;
+        while (el && el.classList && el.classList.contains('muted') && /Interlinear/i.test(el.textContent||'')){
+          const next = el.nextElementSibling;
+          el.remove();
+          el = next;
+        }
+      } catch(e){}
     }
     waitForShowChapterVerses();
   });

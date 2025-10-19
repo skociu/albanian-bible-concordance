@@ -7,6 +7,8 @@ import sqlite3
 import unicodedata
 import base64
 
+_RE_STRONGS = re.compile(r"^[HG]\d{4}$", re.IGNORECASE)
+
 
 ENG_TO_ALB = {
     "Genesis": "Zanafilla",
@@ -141,6 +143,9 @@ nav { margin:.5rem 0 1rem; color:#666; font-size:.95rem; }
 .muted { color:#777; }
 footer { margin-top:2rem; color:#777; font-size:.9rem; }
 @media print { header, nav, footer, .controls { display:none; } body { margin:.5in; } }
+/* Strong's highlight chip */
+.tag { display:inline-block; margin-left:.35rem; padding:.05rem .35rem; border-radius:4px; font-size:.9em; color:#234; background:#eaf4ff; border:1px solid #d6e9ff; }
+.tag.strongs mark { background:#cfe8ff; padding:0 .15rem; }
 </style>
 """
 
@@ -178,6 +183,58 @@ class App:
             """,
             (norm, limit),
         ).fetchall()
+
+    def search_strongs_with_count(self, code: str, limit: int = 100, offset: int = 0):
+        code = (code or '').strip().upper()
+        if not _RE_STRONGS.match(code):
+            return []
+        try:
+            return self.conn.execute(
+                """
+                SELECT b.name, v.book_id, v.chapter, v.verse, v.text, COUNT(*) as cnt
+                FROM strongs s
+                JOIN verses v ON v.id = s.verse_id
+                JOIN books b ON b.id = v.book_id
+                WHERE s.code = ?
+                GROUP BY v.id
+                ORDER BY v.book_id, v.chapter, v.verse
+                LIMIT ? OFFSET ?
+                """,
+                (code, limit, offset),
+            ).fetchall()
+        except Exception:
+            return []
+
+    def count_strongs(self, code: str) -> int:
+        code = (code or '').strip().upper()
+        if not _RE_STRONGS.match(code):
+            return 0
+        try:
+            r = self.conn.execute("SELECT COUNT(DISTINCT verse_id) FROM strongs WHERE code=?", (code,)).fetchone()
+            return int(r[0] or 0)
+        except Exception:
+            return 0
+
+    def search_strongs(self, code: str, limit: int = 100, offset: int = 0):
+        code = (code or '').strip().upper()
+        if not _RE_STRONGS.match(code):
+            return []
+        try:
+            return self.conn.execute(
+                """
+                SELECT b.name, v.book_id, v.chapter, v.verse, v.text
+                FROM strongs s
+                JOIN verses v ON v.id = s.verse_id
+                JOIN books b ON b.id = v.book_id
+                WHERE s.code = ?
+                GROUP BY v.id
+                ORDER BY v.book_id, v.chapter, v.verse
+                LIMIT ? OFFSET ?
+                """,
+                (code, limit, offset),
+            ).fetchall()
+        except Exception:
+            return []
 
 
 def html_page(title: str, body: str) -> bytes:
@@ -283,22 +340,26 @@ class Handler(BaseHTTPRequestHandler):
         if page < 1:
             page = 1
 
-        # total results
-        conn = self.app.conn
-        cur = conn.cursor()
-        norm = normalize_token(fix_encoding_artifacts(q))
-        total = cur.execute(
-            """
-            SELECT COUNT(*) FROM (
-              SELECT v.id
-              FROM tokens t
-              JOIN verses v ON v.id = t.verse_id
-              WHERE t.normalized = ?
-              GROUP BY v.id
-            )
-            """,
-            (norm,),
-        ).fetchone()[0]
+        # total results (Strong's vs Albanian word)
+        is_strongs = _RE_STRONGS.match(q.upper()) is not None
+        if is_strongs:
+            total = self.app.count_strongs(q)
+        else:
+            conn = self.app.conn
+            cur = conn.cursor()
+            norm = normalize_token(fix_encoding_artifacts(q))
+            total = cur.execute(
+                """
+                SELECT COUNT(*) FROM (
+                  SELECT v.id
+                  FROM tokens t
+                  JOIN verses v ON v.id = t.verse_id
+                  WHERE t.normalized = ?
+                  GROUP BY v.id
+                )
+                """,
+                (norm,),
+            ).fetchone()[0]
 
         total_pages = max(1, (total + limit - 1) // limit)
         if page > total_pages:
@@ -306,24 +367,39 @@ class Handler(BaseHTTPRequestHandler):
         offset = (page - 1) * limit
 
         # fetch page
-        rows = cur.execute(
-            """
-            SELECT b.name, v.book_id, v.chapter, v.verse, v.text
-            FROM tokens t
-            JOIN verses v ON v.id = t.verse_id
-            JOIN books b ON b.id = v.book_id
-            WHERE t.normalized = ?
-            GROUP BY v.id
-            ORDER BY v.book_id, v.chapter, v.verse
-            LIMIT ? OFFSET ?
-            """,
-            (norm, limit, offset),
-        ).fetchall()
+        if is_strongs:
+            rows = self.app.search_strongs_with_count(q, limit=limit, offset=offset)
+        else:
+            conn = self.app.conn
+            cur = conn.cursor()
+            norm = normalize_token(fix_encoding_artifacts(q))
+            rows = cur.execute(
+                """
+                SELECT b.name, v.book_id, v.chapter, v.verse, v.text
+                FROM tokens t
+                JOIN verses v ON v.id = t.verse_id
+                JOIN books b ON b.id = v.book_id
+                WHERE t.normalized = ?
+                GROUP BY v.id
+                ORDER BY v.book_id, v.chapter, v.verse
+                LIMIT ? OFFSET ?
+                """,
+                (norm, limit, offset),
+            ).fetchall()
 
         items = []
-        for book, bid, chap, ver, text in rows:
-            h = highlight_text(text, q)
-            items.append(f"<div class='res'><strong>{book} {chap}:{ver}</strong> - {h}</div>")
+        if is_strongs:
+            Q = q.upper()
+            for row in rows:
+                # rows: (book, bid, chap, ver, text, cnt)
+                book, bid, chap, ver, text, cnt = row
+                safe = unicodedata.normalize('NFC', text)
+                chip = f"<span class='tag strongs'>Strong's <mark>{Q}</mark> x {int(cnt or 1)}</span>"
+                items.append(f"<div class='res'><strong>{book} {chap}:{ver}</strong> {chip} - {safe}</div>")
+        else:
+            for book, bid, chap, ver, text in rows:
+                h = highlight_text(text, q)
+                items.append(f"<div class='res'><strong>{book} {chap}:{ver}</strong> - {h}</div>")
 
         # header + pagination controls (no logo in header)
         brand = "<div class='brand'><a href='/'><strong>Albanian Concordance</strong></a></div>"
@@ -369,7 +445,11 @@ class Handler(BaseHTTPRequestHandler):
             limit = int(qs.get("limit", ["100"])[0])
         except Exception:
             limit = 100
-        rows = self.app.search(q, limit=limit)
+        # Strong's export: return Albanian verses for occurrences
+        if _RE_STRONGS.match(q.upper()):
+            rows = self.app.search_strongs(q, limit=limit, offset=0)
+        else:
+            rows = self.app.search(q, limit=limit)
         items = []
         for book, bid, chap, ver, text in rows:
             h = highlight_text(text, q)

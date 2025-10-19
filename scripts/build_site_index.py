@@ -93,8 +93,49 @@ def ensure_dir(path: str) -> None:
     os.makedirs(path, exist_ok=True)
 
 
+def export_strongs_indexes(conn: sqlite3.Connection, out_dir: str) -> None:
+    """Export Strong's -> [verse_id] maps for Hebrew (H####) and Greek (G####).
+    Writes two files: strongs_H.json and strongs_G.json under out_dir.
+    """
+    cur = conn.cursor()
+    data_h = defaultdict(list)
+    data_g = defaultdict(list)
+
+    try:
+        rows = cur.execute("SELECT code, verse_id FROM strongs ORDER BY code, verse_id").fetchall()
+    except Exception:
+        rows = []
+
+    last_code = None
+    last_vid = None
+    for code, vid in rows:
+        if not code or not isinstance(code, str):
+            continue
+        code = code.strip().upper()
+        if not code or len(code) < 2:
+            continue
+        letter = code[0]
+        # dedupe consecutive duplicates
+        if last_code == code and last_vid == vid:
+            continue
+        last_code, last_vid = code, vid
+        if letter == 'H':
+            data_h[code].append(int(vid))
+        elif letter == 'G':
+            data_g[code].append(int(vid))
+
+    ensure_dir(out_dir)
+    path_h = os.path.join(out_dir, 'strongs_H.json')
+    path_g = os.path.join(out_dir, 'strongs_G.json')
+    with open(path_h, 'w', encoding='utf-8') as f:
+        json.dump({"letter": "H", "version": 1, "index": data_h}, f, ensure_ascii=False)
+    with open(path_g, 'w', encoding='utf-8') as f:
+        json.dump({"letter": "G", "version": 1, "index": data_g}, f, ensure_ascii=False)
+
+
 def build_site(db_path: str, out_dir: str, min_len: int = 3, include_stopwords: bool = False) -> None:
     ensure_dir(os.path.join(out_dir, "data", "index"))
+    ensure_dir(os.path.join(out_dir, "data", "strongs"))
 
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
@@ -146,6 +187,18 @@ def build_site(db_path: str, out_dir: str, min_len: int = 3, include_stopwords: 
     if other:
         with open(os.path.join(idx_dir, f"index_other.json"), "w", encoding="utf-8") as f:
             json.dump({"letter": "other", "version": 1, "tokens": other}, f, ensure_ascii=False)
+
+    # Optional: export Strong's -> verse IDs for instant Hebrew/Greek lookup
+    try:
+        has_strongs = cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='strongs'").fetchone()
+    except Exception:
+        has_strongs = None
+    if has_strongs:
+        try:
+            export_strongs_indexes(conn, os.path.join(out_dir, "data", "strongs"))
+        except Exception:
+            # Do not fail site build if strongs export fails
+            pass
 
 
 def main():
