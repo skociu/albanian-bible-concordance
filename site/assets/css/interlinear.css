@@ -22,6 +22,7 @@
 .il-token-col { display: inline-flex; flex-direction: column; align-items: center; text-align: center; margin-inline: .5rem; }
 .il-token-col .top-strong { color: #0ea5e9; font-size: .72rem; line-height: 1.1; }
 .il-token-col .mid-word { font-size: 1.4rem; line-height: 1.6; color: #111827; }
+.il-token-col .bot-sq { font-size: .78rem; line-height: 1.1; color: #374151; margin-top: .1rem; white-space: nowrap; }
 
 /* Greek stacked variant */
 .il-token-col.il-gr .top-strong { color: #2563eb; }
