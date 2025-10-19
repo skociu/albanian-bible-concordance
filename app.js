@@ -12,7 +12,7 @@ function sanitizeVerseText(s){
     return cleanText(s);
   }
 }
-const state = { books: null, verses: null, cache: {}, chaptersByBook: null, searchInterlinearOn: false, lastRefs: null, lastQuery: '' };
+const state = { books: null, verses: null, cache: {}, chaptersByBook: null, searchInterlinearOn: false, lastRefs: null, lastQuery: '', lastMode: 'sq', vidMap: null, maxChByBook: null, strongs: { H:null, G:null } };
 
 function normalizeToken(s) {
   return (s || '')
@@ -65,6 +65,133 @@ function highlightText(text, query) {
 function showStatus(msg) {
   const el = document.getElementById('status');
   if (el) el.textContent = msg || '';
+}
+
+// --- Hebrew/Greek helpers (Single Responsibility: normalization) ---
+function hebrewConsonantsOnly(s){
+  s = String(s||'');
+  try {
+    s = s.replace(/[\u0591-\u05C7]/g, ''); // niqqud + cantillation
+    s = s.replace(/[\u05BE\u05C0\u05C3\u05F3\u05F4]/g, '');
+    s = s.replace(/[\u200E\u200F\u202A-\u202E]/g, '');
+  } catch(e) {}
+  return s.replace(/\s+/g,' ').trim();
+}
+
+// Generate normalized Hebrew search variants by progressively removing common prefixes (ו, ה, ב, כ, ל, מ)
+function hebrewVariants(needle){
+  const set = new Set();
+  let s = hebrewConsonantsOnly(needle||'');
+  if (!s) return [];
+  set.add(s);
+  const PREFIX = new Set(['\u05D5','\u05D4','\u05D1','\u05DB','\u05DC','\u05DE']); // ו ה ב כ ל מ
+  while (s.length > 1 && PREFIX.has(s[0])){
+    s = s.slice(1);
+    set.add(s);
+  }
+  return Array.from(set);
+}
+
+function greekRemoveDiacritics(s){
+  s = String(s||'');
+  try {
+    s = s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    s = s.replace(/[\u200E\u200F\u202A-\u202E]/g, '');
+  } catch(e) {}
+  // Normalize sigma forms: final sigma to standard sigma
+  s = s.replace(/\u03C2/g, '\u03C3').replace(/\u03A3/g, '\u03A3');
+  return s.replace(/\s+/g,' ').trim();
+}
+
+function isHebrewString(s){ return /[\u0590-\u05FF]/.test(String(s||'')); }
+function isGreekString(s){ return /[\u0370-\u03FF]/.test(String(s||'')); }
+
+// Build verse-id map and max chapter per book lazily (Interface Segregation: small APIs)
+function ensureVidMap(){
+  if (state.vidMap && state.maxChByBook) return;
+  const verses = state.verses||[];
+  const vm = new Map();
+  const maxBy = {};
+  for (let i=0; i<verses.length; i++){
+    const row = verses[i]; if (!row) continue; // holes possible
+    const bid = row[0]|0, chap=row[1]|0, ver=row[2]|0;
+    const key = `${bid}|${chap}|${ver}`;
+    vm.set(key, i+1);
+    if (!maxBy[bid] || chap>maxBy[bid]) maxBy[bid] = chap;
+  }
+  state.vidMap = vm;
+  state.maxChByBook = maxBy;
+}
+
+// List chapter JSONs for Hebrew (OT) or Greek (NT) books (Dependency Inversion: depend on global BOOK_SLUGS_BY_ID)
+function listChapterPaths(lang){
+  const paths = [];
+  const books = (typeof BOOK_SLUGS_BY_ID !== 'undefined') ? BOOK_SLUGS_BY_ID : [];
+  const range = lang === 'heb' ? [1, 39] : [40, books.length-1];
+  for (let bid=range[0]; bid<=range[1]; bid++){
+    const slug = books[bid];
+    if (!slug) continue;
+    const maxC = (state.maxChByBook && state.maxChByBook[bid]) ? state.maxChByBook[bid] : 0;
+    for (let c=1; c<=maxC; c++){
+      paths.push({ bid, chap:c, path:`data/${slug}/${c}.json` });
+    }
+  }
+  return paths;
+}
+
+async function fetchJSON(path){
+  const res = await fetch(path, { cache:'no-store' });
+  if (!res.ok) throw new Error('HTTP '+res.status);
+  return res.json();
+}
+
+async function loadStrongs(letter){
+  const L = (letter||'').toUpperCase();
+  if (!state.strongs) state.strongs = {H:null,G:null};
+  if (state.strongs[L]) return state.strongs[L];
+  const path = `data/strongs/strongs_${L}.json`;
+  const obj = await fetchJSON(path);
+  const index = obj && (obj.index || obj.tokens || obj);
+  state.strongs[L] = index || {};
+  return state.strongs[L];
+}
+
+// Generic chapter scanner (Liskov: predicate interface works for both heb/grc)
+async function scanChapters(paths, predicate, limit, onProgress){
+  const results = [];
+  const seen = new Set();
+  const max = limit || 200;
+  let scanned = 0;
+  const CONC = 8;
+  let idx = 0;
+  async function worker(){
+    while (idx < paths.length && results.length < max){
+      const my = paths[idx++];
+      try {
+        const ch = await fetchJSON(my.path);
+        const verses = ch && ch.verses || [];
+        for (const v of verses){
+          const vnum = v.v|0;
+          const key = `${my.bid}|${my.chap}|${vnum}`;
+          let match = false;
+          const src = v.src || [];
+          for (let t of src){ if (predicate(t)){ match = true; break; } }
+          if (match){
+            const vid = state.vidMap.get(key);
+            if (vid && !seen.has(vid)){
+              seen.add(vid); results.push(vid);
+              if (results.length >= max) break;
+            }
+          }
+        }
+      } catch(e) { /* ignore 404s */ }
+      scanned++;
+      if (onProgress) try{ onProgress({ scanned, total: paths.length, found: results.length }); }catch(e){}
+    }
+  }
+  const workers = Array.from({length: Math.min(CONC, paths.length)}, ()=>worker());
+  await Promise.all(workers);
+  return results;
 }
 
 function ensureResultsInterlinearToggle(){
@@ -143,9 +270,83 @@ async function runSearch(q) {
   renderResults(q, refs);
 }
 
+// --- Hebrew/Greek search orchestrators (Open/Closed: new modes without changing core render) ---
+async function runSearchHeb(q){
+  const s = String(q||'').trim(); if (!s) return;
+  showStatus('Po p&euml;rpunon (Hebraisht)...');
+  await Promise.all([loadBooks(), loadVerses()]); ensureVidMap();
+  const codeM = s.match(/^(?:H)?(\d{4})$/i);
+  const isHeb = isHebrewString(s);
+  const needle = isHeb ? hebrewConsonantsOnly(s) : s.toLowerCase();
+  // Fast path: Strong's
+  if (codeM){
+    const code = 'H' + codeM[1];
+    try {
+      const idx = await loadStrongs('H');
+      const refs = (idx && idx[code]) ? idx[code] : [];
+      showStatus(''); state.lastMode='heb';
+      return renderResults(q, refs);
+    } catch(e){}
+  }
+  const paths = listChapterPaths('heb');
+  const variants = isHeb ? hebrewVariants(needle) : [needle];
+  const exactPred = (tok)=>{
+    if (!tok) return false;
+    if (codeM) return String(tok.s||'').toUpperCase() === ('H'+codeM[1]);
+    if (isHeb){
+      const w = hebrewConsonantsOnly(tok.w||'');
+      if (!w) return false;
+      for (const v of variants){ if (w === v) return true; }
+      return false;
+    }
+    return String((tok.t||'')).toLowerCase() === needle;
+  };
+  let refs = await scanChapters(paths, exactPred, 300, (p)=>showStatus(`Heb.: ${p.found} rezultate – kapituj ${p.scanned}/${p.total}`));
+  if ((!refs || refs.length === 0) && isHeb && needle.length >= 2){
+    const containsPred = (tok)=>{
+      const w = hebrewConsonantsOnly(tok && tok.w || '');
+      if (!w) return false;
+      for (const v of variants){ if (w.includes(v)) return true; }
+      return false;
+    };
+    refs = await scanChapters(paths, containsPred, 300, (p)=>showStatus(`Heb. (pjesore): ${p.found} rezultate – kapituj ${p.scanned}/${p.total}`));
+  }
+  showStatus(''); state.lastMode = 'heb';
+  renderResults(q, refs||[]);
+}
+
+async function runSearchGrc(q){
+  const s = String(q||'').trim(); if (!s) return;
+  showStatus('Po p&euml;rpunon (Greqisht)...');
+  await Promise.all([loadBooks(), loadVerses()]); ensureVidMap();
+  const codeM = s.match(/^(?:G)?(\d{4})$/i);
+  const isGr = isGreekString(s);
+  const needle = isGr ? greekRemoveDiacritics(s).toLowerCase() : s.toLowerCase();
+  // Fast path: Strong's
+  if (codeM){
+    const code = 'G' + codeM[1];
+    try {
+      const idx = await loadStrongs('G');
+      const refs = (idx && idx[code]) ? idx[code] : [];
+      showStatus(''); state.lastMode='grc';
+      return renderResults(q, refs);
+    } catch(e){}
+  }
+  const pred = (tok)=>{
+    const sc = String(tok.s||'').toUpperCase();
+    if (codeM) return sc === ('G'+codeM[1]);
+    if (isGr){ return greekRemoveDiacritics(tok.w||'').toLowerCase() === needle; }
+    return String((tok.t||'')).toLowerCase() === needle;
+  };
+  const paths = listChapterPaths('grc');
+  const refs = await scanChapters(paths, pred, 300, (p)=>showStatus(`Greq.: ${p.found} rezultate – kapituj ${p.scanned}/${p.total}`));
+  showStatus(''); state.lastMode = 'grc';
+  renderResults(q, refs);
+}
+
 function currentResultsHTML() {
   const container = document.getElementById('results');
-  const title = (document.getElementById('q')?.value || '').trim();
+  const title = (state.lastQuery||'').trim();
   return (
     `<!doctype html><meta charset="utf-8">` +
     `<title>Rezultatet p�r ${title}</title>` +
@@ -170,6 +371,35 @@ function downloadHTML(filename, html) {
 function setupUI() {
   const form = document.getElementById('search-form');
   if (form) {
+    // Insert 3-column search UI if not present; hide legacy single-field submit
+    if (!document.getElementById('search-3col')){
+      try {
+        const legacyInput = form.querySelector('#q');
+        const legacySubmit = form.querySelector('button[type="submit"]');
+        if (legacyInput) legacyInput.style.display = 'none';
+        if (legacySubmit) legacySubmit.style.display = 'none';
+        const grid = document.createElement('div'); grid.id = 'search-3col'; grid.className='search-3col';
+        const mkCol = (id, lbl, ph, dir)=>{
+          const col = document.createElement('div'); col.className='search-col';
+          const lab = document.createElement('label'); lab.className='lbl'; lab.htmlFor = id; lab.textContent = lbl;
+          const row = document.createElement('div'); row.className='row';
+          const inp = document.createElement('input'); inp.type='text'; inp.id=id; inp.placeholder=ph; inp.autocomplete='off'; if (dir) inp.setAttribute('dir',dir);
+          const btn = document.createElement('button'); btn.type='button'; btn.id='btn-'+id.split('-')[1]; btn.textContent='Kërko';
+          row.appendChild(inp); row.appendChild(btn); col.appendChild(lab); col.appendChild(row); return col;
+        };
+        grid.appendChild(mkCol('q-sq','Shqip','Kërko fjalën (p.sh. dashuri)'));
+        grid.appendChild(mkCol('q-heb','Hebraisht','Fjalë ose Strong (p.sh. H07225)','rtl'));
+        grid.appendChild(mkCol('q-grc','Greqisht','Fjalë ose Strong (p.sh. G3056)'));
+        form.insertBefore(grid, form.firstChild);
+        // actions row if missing
+        if (!form.querySelector('.form-actions')){
+          const actions = document.createElement('div'); actions.className='form-actions';
+          const btnP = document.getElementById('btn-print') || (function(){ const b=document.createElement('button'); b.type='button'; b.id='btn-print'; b.textContent='Printo'; return b; })();
+          const btnD = document.getElementById('btn-download') || (function(){ const b=document.createElement('button'); b.type='button'; b.id='btn-download'; b.textContent='Shkarko HTML'; return b; })();
+          actions.appendChild(btnP); actions.appendChild(btnD); form.appendChild(actions);
+        }
+      } catch(e){}
+    }
     // Ensure reference search controls exist (insert next to main search)
     if (!document.getElementById('refq')){
       try {
@@ -201,7 +431,8 @@ function setupUI() {
     }
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      const q = document.getElementById('q').value;
+      const q = (document.getElementById('q-sq')?.value || document.getElementById('q')?.value || '').trim();
+      state.lastMode = 'sq';
       runSearch(q);
     });
   }
@@ -226,9 +457,23 @@ function setupUI() {
   const btnDl = document.getElementById('btn-download');
   if (btnDl)
     btnDl.addEventListener('click', () => {
-      const q = document.getElementById('q').value || 'rezultate';
+      const q = state.lastQuery || document.getElementById('q-sq')?.value || 'rezultate';
       downloadHTML(`kerkimi_${normalizeToken(q)}.html`, currentResultsHTML());
     });
+
+  // Wire three-column search buttons and Enter keys
+  const btnSq = document.getElementById('btn-sq');
+  const btnHeb = document.getElementById('btn-heb');
+  const btnGrc = document.getElementById('btn-grc');
+  const inpSq = document.getElementById('q-sq');
+  const inpHeb = document.getElementById('q-heb');
+  const inpGrc = document.getElementById('q-grc');
+  if (btnSq && inpSq) btnSq.addEventListener('click', ()=>{ state.lastMode='sq'; runSearch(inpSq.value||''); });
+  if (btnHeb && inpHeb) btnHeb.addEventListener('click', ()=>{ state.lastMode='heb'; runSearchHeb(inpHeb.value||''); });
+  if (btnGrc && inpGrc) btnGrc.addEventListener('click', ()=>{ state.lastMode='grc'; runSearchGrc(inpGrc.value||''); });
+  if (inpSq) inpSq.addEventListener('keydown', (ev)=>{ if (ev.key==='Enter'){ ev.preventDefault(); state.lastMode='sq'; runSearch(inpSq.value||''); }});
+  if (inpHeb) inpHeb.addEventListener('keydown', (ev)=>{ if (ev.key==='Enter'){ ev.preventDefault(); state.lastMode='heb'; runSearchHeb(inpHeb.value||''); }});
+  if (inpGrc) inpGrc.addEventListener('keydown', (ev)=>{ if (ev.key==='Enter'){ ev.preventDefault(); state.lastMode='grc'; runSearchGrc(inpGrc.value||''); }});
 
   const home = document.getElementById('nav-home');
   const about = document.getElementById('nav-about');
