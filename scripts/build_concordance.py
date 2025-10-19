@@ -5,6 +5,7 @@ import sqlite3
 from typing import Dict, Iterable, List, Tuple
 import unicodedata
 import csv
+import json
 
 # English → Albanian book name mapping
 ENG_TO_ALB = {
@@ -211,6 +212,22 @@ def init_db(db_path: str) -> sqlite3.Connection:
     return conn
 
 
+def ensure_strongs_schema(conn: sqlite3.Connection) -> None:
+    conn.executescript(
+        """
+        CREATE TABLE IF NOT EXISTS strongs (
+            id INTEGER PRIMARY KEY,
+            verse_id INTEGER NOT NULL,
+            code TEXT NOT NULL,  -- e.g., H07225, G3056
+            FOREIGN KEY(verse_id) REFERENCES verses(id)
+        );
+        CREATE INDEX IF NOT EXISTS idx_strongs_code ON strongs(code);
+        CREATE INDEX IF NOT EXISTS idx_strongs_verse ON strongs(verse_id);
+        CREATE UNIQUE INDEX IF NOT EXISTS uniq_strongs_verse_code ON strongs(verse_id, code);
+        """
+    )
+
+
 def insert_books(conn: sqlite3.Connection, books: List[str]) -> None:
     conn.executemany("INSERT INTO books(id, name) VALUES (?, ?)", [(i + 1, name) for i, name in enumerate(books)])
 
@@ -253,6 +270,121 @@ def cmd_build(args: argparse.Namespace) -> None:
     print("Done.")
 
 
+# ---------- Strong's (Hebrew/Greek) indexing from site/data ----------
+
+_RE_STRONGS = re.compile(r"^[HG]\d{4}$", re.IGNORECASE)
+
+
+def _norm_name(s: str) -> str:
+    try:
+        s = unicodedata.normalize('NFD', s or '')
+        s = ''.join(ch for ch in s if unicodedata.category(ch) != 'Mn')
+    except Exception:
+        pass
+    out = []
+    for ch in (s or '').lower():
+        if ch.isalnum() or ch.isspace():
+            out.append(ch)
+    return ' '.join(''.join(out).split())
+
+
+def load_book_name_to_id(conn: sqlite3.Connection) -> Dict[str, int]:
+    m: Dict[str, int] = {}
+    for bid, name in conn.execute("SELECT id, name FROM books").fetchall():
+        raw = (name or '').strip()
+        m[raw] = bid
+        m[_norm_name(raw)] = bid
+    return m
+
+
+def iter_chapter_json(site_dir: str):
+    data_root = os.path.join(site_dir, 'data')
+    if not os.path.isdir(data_root):
+        return
+    for sub in os.listdir(data_root):
+        subdir = os.path.join(data_root, sub)
+        if not os.path.isdir(subdir):
+            continue
+        for fname in os.listdir(subdir):
+            if not fname.endswith('.json'):
+                continue
+            path = os.path.join(subdir, fname)
+            # skip large global files
+            base = os.path.basename(path).lower()
+            if base in ('books.json', 'verses.json'):
+                continue
+            yield path
+
+
+def build_strongs_index(conn: sqlite3.Connection, site_dir: str) -> int:
+    ensure_strongs_schema(conn)
+    book_name_to_id = load_book_name_to_id(conn)
+    cur = conn.cursor()
+    inserted = 0
+    batch: List[Tuple[int, str]] = []
+
+    def flush():
+        nonlocal batch, inserted
+        if not batch:
+            return
+        cur.executemany("INSERT OR IGNORE INTO strongs(verse_id, code) VALUES (?, ?)", batch)
+        inserted += len(batch)
+        batch = []
+
+    for path in iter_chapter_json(site_dir):
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                obj = json.load(f)
+        except Exception:
+            continue
+        ref = obj.get('ref') or {}
+        book_sq = (ref.get('book_sq') or '').strip()
+        chapter = int(ref.get('chapter') or 0)
+        if not book_sq or not chapter:
+            continue
+        bid = book_name_to_id.get(book_sq) or book_name_to_id.get(_norm_name(book_sq))
+        if not bid:
+            # fallback: try partials
+            bid = book_name_to_id.get(_norm_name(book_sq).split(' ')[0] or '')
+        if not bid:
+            continue
+        verses = obj.get('verses') or []
+        for v in verses:
+            vnum = int(v.get('v') or 0)
+            if not vnum:
+                continue
+            # lookup verse_id
+            row = cur.execute("SELECT id FROM verses WHERE book_id=? AND chapter=? AND verse=?", (bid, chapter, vnum)).fetchone()
+            if not row:
+                continue
+            vid = int(row[0])
+            for tok in (v.get('src') or []):
+                code = (tok.get('s') or '').strip().upper()
+                if not code or not _RE_STRONGS.match(code):
+                    continue
+                batch.append((vid, code))
+            if len(batch) >= 5000:
+                flush()
+    flush()
+    conn.commit()
+    return inserted
+
+
+def cmd_build_strongs(args: argparse.Namespace) -> None:
+    db_path = args.db
+    site_dir = args.site
+    if not os.path.exists(db_path):
+        raise SystemExit(f"Database not found: {args.db}. Build it first with: python scripts/build_concordance.py build")
+    if not os.path.isdir(site_dir):
+        raise SystemExit(f"Site directory not found: {site_dir}")
+    conn = sqlite3.connect(db_path)
+    with conn:
+        ensure_strongs_schema(conn)
+        # Use INSERT OR IGNORE semantics; table can be rebuilt by clearing it
+        created = build_strongs_index(conn, site_dir)
+    print(f"Indexed Strong's occurrences: ~{created} rows (duplicates ignored)")
+
+
 def search_lemma(conn: sqlite3.Connection, word: str, limit: int = 50) -> List[Tuple[str, int, int, int, str]]:
     norm = normalize_token(fix_encoding_artifacts(word))
     rows = conn.execute(
@@ -271,19 +403,43 @@ def search_lemma(conn: sqlite3.Connection, word: str, limit: int = 50) -> List[T
     return rows
 
 
+def search_strongs(conn: sqlite3.Connection, code: str, limit: int = 200) -> List[Tuple[str, int, int, int, str]]:
+    code = (code or '').strip().upper()
+    if not _RE_STRONGS.match(code):
+        return []
+    rows = conn.execute(
+        """
+        SELECT b.name, v.book_id, v.chapter, v.verse, v.text
+        FROM strongs s
+        JOIN verses v ON v.id = s.verse_id
+        JOIN books b ON b.id = v.book_id
+        WHERE s.code = ?
+        GROUP BY v.id
+        ORDER BY v.book_id, v.chapter, v.verse
+        LIMIT ?
+        """,
+        (code, limit),
+    ).fetchall()
+    return rows
+
+
 def cmd_search(args: argparse.Namespace) -> None:
     db_path = args.db
     word = args.word
     limit = args.limit
     conn = sqlite3.connect(db_path)
-    res = search_lemma(conn, word, limit=limit)
+    # If query looks like a Strong's code (H####/G####), run Strong's search
+    if _RE_STRONGS.match((word or '').strip().upper()):
+        res = search_strongs(conn, word, limit=limit)
+    else:
+        res = search_lemma(conn, word, limit=limit)
     if not res:
         print("No results.")
         return
     print(f"Results for '{word}' ({len(res)} verses):")
     for book_name, book_id, chap, verse_no, text in res:
         safe_text = unicodedata.normalize("NFC", text)
-        print(f"- {book_name} {chap}:{verse_no} — {safe_text}")
+        print(f"- {book_name} {chap}:{verse_no} – {safe_text}")
 
 
 def highlight_text(text: str, query: str) -> str:
@@ -317,7 +473,10 @@ def sanitize_name(s: str) -> str:
 
 
 def export_search(conn: sqlite3.Connection, word: str, fmt: str, out_path: str, limit: int = 1000) -> str:
-    rows = search_lemma(conn, word, limit=limit)
+    if _RE_STRONGS.match((word or '').strip().upper()):
+        rows = search_strongs(conn, word, limit=limit)
+    else:
+        rows = search_lemma(conn, word, limit=limit)
     ensure_exports_dir(out_path)
     if fmt == "txt":
         with open(out_path, "w", encoding="utf-8") as f:
@@ -391,13 +550,14 @@ def cmd_top(args: argparse.Namespace) -> None:
 
 def build_arg_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Build and query an Albanian Bible concordance (SQLite)")
-    p.add_argument("command", choices=["build", "search", "top", "export"], help="Action to run")
+    p.add_argument("command", choices=["build", "build-strongs", "search", "top", "export"], help="Action to run")
     p.add_argument("word", nargs="?", help="Word to search (for 'search')")
     p.add_argument("--sql", default="Alb.sql.txt", help="Path to source SQL dump (default: Alb.sql.txt)")
     p.add_argument("--db", default="alb_concordance.sqlite", help="Output SQLite DB path (default: alb_concordance.sqlite)")
     p.add_argument("--limit", type=int, default=50, help="Limit results for listing/search")
     p.add_argument("--format", choices=["html", "txt", "csv"], default="html", help="Export format (for 'export')")
     p.add_argument("--out", help="Output file path (for 'export')")
+    p.add_argument("--site", default="site", help="Path to static site root (for 'build-strongs')")
     return p
 
 
@@ -406,6 +566,8 @@ def main() -> None:
     args = p.parse_args()
     if args.command == "build":
         cmd_build(args)
+    elif args.command == "build-strongs":
+        cmd_build_strongs(args)
     elif args.command == "search":
         if not args.word:
             print("Please provide a word to search.")

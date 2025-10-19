@@ -6,6 +6,9 @@ Quick start (build a local concordance):
 - Build the SQLite database: `python scripts/build_concordance.py build`
 - Search a word: `python scripts/build_concordance.py search dashuri`
 - List most frequent lemmas: `python scripts/build_concordance.py top --limit 50`
+- Index Strong's (Hebrew/Greek) from interlinear JSON and search by code:
+   - `python scripts/build_concordance.py build-strongs --site site`
+   - Example: `python scripts/build_concordance.py search G3056` or `python scripts/build_concordance.py search H07225`
 
 Notes:
 
@@ -23,7 +26,8 @@ Minimal Web UI
 
 - Run: `python scripts/web_ui.py --db alb_concordance.sqlite --port 8000`
 - Open: `http://127.0.0.1:8000`
-- Features: search (accent-insensitive), browse books/chapters, export search results (HTML/TXT/CSV). HTML export is print-friendly.
+- Features: search (accent-insensitive), Strong's search (`G####`/`H####`), browse books/chapters, export results (HTML/TXT/CSV). HTML export is print-friendly.
+ - Static site: run `python scripts/build_concordance.py build-strongs --site site` then `python scripts/build_site_index.py --out site` to generate `site/data/strongs/strongs_H.json` and `strongs_G.json` for instant Strong's lookups in the UI.
 
 Export Results (for printing)
 
@@ -39,7 +43,7 @@ Publish Free on GitHub Pages
 - What it is: a static site in `site/` that serves client-side search using JSON indexes. No server needed.
 - One-time setup: in your repo, enable Pages at Settings → Pages, Source: GitHub Actions.
 - Deploy: push to `main` (or `master`). The workflow `.github/workflows/gh-pages.yml` builds the DB and JSON and publishes `site/`.
-- Local preview: build DB, then `python scripts/build_site_index.py --out site` and serve it locally (fetch needs HTTP): `python -m http.server -d site 8080` then open `http://127.0.0.1:8080`.
+- Local preview: build DB, run `build-strongs`, then `python scripts/build_site_index.py --out site` and serve it locally (fetch needs HTTP): `python -m http.server -d site 8080` then open `http://127.0.0.1:8080`.
 - Data size: indexes are sharded by first letter; verses are a single JSON file. We can further shard verses per book if needed.
 
 Manual deploy with git subtree (site/ -> gh-pages)
