@@ -41,12 +41,33 @@
     <div id="browse-verses"></div>
   </section>
 
-  <section id="about" style="display:none">
-    <p>Kjo është një konkordancë statike dhe falas, e ndërtuar me ndihmën e agjentëve AI dhe nga Alb.sql duke përdorur skedarë JSON në GitHub Pages. Nuk kërkohet server.</p>
+    <section id="about" style="display:none">
+    <p>Kjo është një konkordancë statike dhe falas. Ndërtohet nga një bazë e të dhënave SQLite dhe shërbehet si faqe statike (GitHub Pages). Nuk kërkohet server.</p>
     <ul>
-      <li>Kërko sipas fjalës (token)</li>
-      <li>Thekso përputhjet në tekst</li>
-      <li>Pamje e përshtatshme për printim</li>
+      <li>Kërko sipas fjalës (token) në Shqip</li>
+      <li>Kërkim Strong’s (G####/H####) për Greqisht/Hebraisht</li>
+      <li>Shfaq/printo rezultatet në HTML/TXT/CSV</li>
+    </ul>
+    <h3>Burimet e tekstit</h3>
+    <ul>
+      <li>Shqip (ALB – Scrollmapper):
+        <a href="https://github.com/scrollmapper/bible_databases" target="_blank" rel="noopener">Repo</a>
+        · <a href="https://raw.githubusercontent.com/scrollmapper/bible_databases/refs/heads/master/formats/sql/Alb.sql" target="_blank" rel="noopener">Alb.sql</a>
+        (Public Domain)
+      </li>
+      <li>Greqisht (Textus Receptus 1894, Robinson parsed UTR):
+        <a href="https://github.com/byztxt/greektext-textus-receptus" target="_blank" rel="noopener">Repo</a>
+        (Public Domain)
+      </li>
+      <li>Hebraisht (WLC via OSHB):
+        <a href="https://github.com/openscriptures/morphhb" target="_blank" rel="noopener">OpenScriptures Hebrew Morphology</a>
+        (WLC Public Domain; OSHB CC BY 4.0)
+      </li>
+      <li>Glossat Strong’s (STEPBible Data):
+        <a href="https://raw.githubusercontent.com/STEPBible/STEPBible-Data/master/Lexicons/TBESG%20-%20Translators%20Brief%20lexicon%20of%20Extended%20Strongs%20for%20Greek%20-%20STEPBible.org%20CC%20BY.txt" target="_blank" rel="noopener">TBESG (Greqisht)</a>
+        · <a href="https://raw.githubusercontent.com/STEPBible/STEPBible-Data/master/Lexicons/TBESH%20-%20Translators%20Brief%20lexicon%20of%20Extended%20Strongs%20for%20Hebrew%20-%20STEPBible.org%20CC%20BY.txt" target="_blank" rel="noopener">TBESH (Hebraisht)</a>
+        (CC BY 4.0)
+      </li>
     </ul>
   </section>
 
@@ -56,6 +77,6 @@
 </div>
 <script src="app.js?v=11"></script>
 <script src="assets/js/interlinear.js?v=5"></script>
-<script src="assets/js/app.js?v=3"></script>
+<script src="assets/js/app.js?v=4"></script>
 
 
