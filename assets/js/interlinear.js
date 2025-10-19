@@ -228,6 +228,9 @@ function cleanTxt(s){
         const s = (tok.s||'').startsWith('H') ? tok.s : '';
         const top1 = el('div', {class:'top-strong'}, [s]);
         const mid = el('div', {class:'mid-word'}, [stripSlashes(tok.w)]);
+        const bot = (Object.prototype.hasOwnProperty.call(alignedMap, tok.i))
+          ? el('div', {class:'bot-sq'}, [alignedMap[tok.i]])
+          : null;
         try {
           if (typeof tok.i === 'number'){
             const partsCount = Math.max(1, String(tok.l||'').split('/').length);
@@ -241,6 +244,7 @@ function cleanTxt(s){
         } catch(e) {}
         cell.appendChild(top1);
         cell.appendChild(mid);
+        if (bot) cell.appendChild(bot);
         rowA.appendChild(cell);
       }
     } else {
@@ -253,8 +257,12 @@ function cleanTxt(s){
           const s = hasStrong ? tok.s : '';
           const top1 = el('div', {class:'top-strong'}, [s]);
           const mid = el('div', {class:'mid-word'}, [stripSlashes(tok.w)]);
+          const bot = (Object.prototype.hasOwnProperty.call(alignedMap, tok.i))
+            ? el('div', {class:'bot-sq'}, [alignedMap[tok.i]])
+            : null;
           cell.appendChild(top1);
           cell.appendChild(mid);
+          if (bot) cell.appendChild(bot);
           rowA.appendChild(cell);
         } else {
           const cell = el('span', {class:'il-cell token', tabindex:'0', title: tokenTooltip(tok), role:'cell'});
