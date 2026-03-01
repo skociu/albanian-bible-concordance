@@ -44,6 +44,9 @@ exports/
 dist/
 build/
 
+# Claude Code
+.claude/
+
 # Keep GitHub Pages docs/ tracked (do NOT ignore)
 .github/prompts
 

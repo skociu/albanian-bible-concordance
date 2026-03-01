@@ -145,13 +145,14 @@ def build_site(db_path: str, out_dir: str, min_len: int = 3, include_stopwords: 
     with open(os.path.join(out_dir, "data", "books.json"), "w", encoding="utf-8") as f:
         json.dump(books, f, ensure_ascii=False)
 
-    # Export verses as array where index = verse_id-1, item = [book_id, chapter, verse, text]
+    # Export verses as array where index = verse_id-1, item = [book_id, chapter, verse, text, kjv_text]
     verses = []
-    for vid, bid, chap, ver, text in cur.execute("SELECT id, book_id, chapter, verse, text FROM verses ORDER BY id"):
+    for row in cur.execute("SELECT id, book_id, chapter, verse, text, kjv_text FROM verses ORDER BY id"):
+        vid, bid, chap, ver, text, kjv_text = row
         # Ensure the list is contiguous up to vid
         while len(verses) < vid - 1:
             verses.append(None)
-        verses.append([bid, chap, ver, unicodedata.normalize("NFC", text)])
+        verses.append([bid, chap, ver, unicodedata.normalize("NFC", text), kjv_text or ""])
     with open(os.path.join(out_dir, "data", "verses.json"), "w", encoding="utf-8") as f:
         json.dump(verses, f, ensure_ascii=False)
 

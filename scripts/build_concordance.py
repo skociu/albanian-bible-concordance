@@ -78,9 +78,9 @@ ENG_TO_ALB = {
 }
 
 
-SQL_LINE_BOOK = re.compile(r"INSERT INTO `Alb_books` \(`name`\) VALUES \('(.+?)'\);")
+SQL_LINE_BOOK = re.compile(r"INSERT INTO `\w+_books` \(`name`\) VALUES \('(.+?)'\);")
 SQL_LINE_VERSE = re.compile(
-    r"INSERT INTO `Alb_verses` \(`book_id`, `chapter`, `verse`, `text`\) VALUES \((\d+),\s*(\d+),\s*(\d+),\s*'((?:[^'\\]|\\.)*)'\);"
+    r"INSERT INTO `\w+_verses` \(`book_id`, `chapter`, `verse`, `text`\) VALUES \((\d+),\s*(\d+),\s*(\d+),\s*'((?:[^'\\]|\\.)*)'\);"
 )
 
 
@@ -190,6 +190,7 @@ def init_db(db_path: str) -> sqlite3.Connection:
             chapter INTEGER NOT NULL,
             verse INTEGER NOT NULL,
             text TEXT NOT NULL,
+            kjv_text TEXT,
             FOREIGN KEY(book_id) REFERENCES books(id)
         );
 
@@ -253,6 +254,19 @@ def build_tokens(conn: sqlite3.Connection) -> int:
     return len(to_insert)
 
 
+def merge_kjv(conn: sqlite3.Connection, kjv_sql_path: str) -> int:
+    """Parse KJV SQL dump and merge English text into verses.kjv_text."""
+    _, kjv_verses = parse_sql_dump(kjv_sql_path)
+    count = 0
+    for book_id, chapter, verse, text in kjv_verses:
+        conn.execute(
+            "UPDATE verses SET kjv_text = ? WHERE book_id = ? AND chapter = ? AND verse = ?",
+            (text, book_id, chapter, verse),
+        )
+        count += 1
+    return count
+
+
 def cmd_build(args: argparse.Namespace) -> None:
     sql_path = args.sql
     db_path = args.db
@@ -267,6 +281,22 @@ def cmd_build(args: argparse.Namespace) -> None:
         insert_verses(conn, verses)
         token_count = build_tokens(conn)
     print(f"Inserted tokens: {token_count}")
+
+    # Merge KJV English text if available
+    kjv_path = getattr(args, 'kjv', None)
+    if not kjv_path:
+        # Auto-detect KJV.sql.txt next to the Albanian SQL file
+        candidate = os.path.join(os.path.dirname(sql_path) or '.', 'KJV.sql.txt')
+        if os.path.isfile(candidate):
+            kjv_path = candidate
+    if kjv_path and os.path.isfile(kjv_path):
+        print(f"Merging KJV English from {kjv_path} ...")
+        with conn:
+            n = merge_kjv(conn, kjv_path)
+        print(f"Merged KJV text for {n} verses.")
+    else:
+        print("No KJV file found, skipping English merge.")
+
     print("Done.")
 
 
@@ -558,6 +588,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--format", choices=["html", "txt", "csv"], default="html", help="Export format (for 'export')")
     p.add_argument("--out", help="Output file path (for 'export')")
     p.add_argument("--site", default="site", help="Path to static site root (for 'build-strongs')")
+    p.add_argument("--kjv", default=None, help="Path to KJV SQL dump (default: auto-detect KJV.sql.txt)")
     return p
 
 
