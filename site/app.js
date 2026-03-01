@@ -12,7 +12,7 @@ function sanitizeVerseText(s){
     return cleanText(s);
   }
 }
-const state = { books: null, verses: null, cache: {}, chaptersByBook: null, searchInterlinearOn: false, lastRefs: null, lastQuery: '', lastMode: 'sq', vidMap: null, maxChByBook: null, strongs: { H:null, G:null } };
+const state = { books: null, verses: null, cache: {}, chaptersByBook: null, searchInterlinearOn: false, kjvOn: false, lastRefs: null, lastQuery: '', lastMode: 'sq', vidMap: null, maxChByBook: null, strongs: { H:null, G:null } };
 
 function normalizeToken(s) {
   return (s || '')
@@ -31,7 +31,7 @@ async function loadBooks() {
 async function loadVerses() {
   if (state.verses) return state.verses;
   const res = await fetch('data/verses.json');
-  state.verses = await res.json(); try { state.verses = (state.verses||[]).map(r => Array.isArray(r) && r.length>3 ? [r[0], r[1], r[2], sanitizeVerseText(r[3])] : r); } catch(e){}
+  state.verses = await res.json(); try { state.verses = (state.verses||[]).map(r => Array.isArray(r) && r.length>3 ? [r[0], r[1], r[2], sanitizeVerseText(r[3]), r[4] || ''] : r); } catch(e){}
   return state.verses;
 }
 
@@ -221,9 +221,40 @@ function ensureResultsInterlinearToggle(){
   }
 }
 
+function ensureKjvToggle(){
+  if (document.getElementById('btn-kjv-toggle')) return;
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.id = 'btn-kjv-toggle';
+  btn.textContent = state.kjvOn ? 'Mbylle KJV' : 'Shiko KJV';
+  btn.addEventListener('click', () => {
+    state.kjvOn = !state.kjvOn;
+    btn.textContent = state.kjvOn ? 'Mbylle KJV' : 'Shiko KJV';
+    if (state.lastRefs) renderResults(state.lastQuery || '', state.lastRefs);
+    // Re-render browse verses if visible
+    const browseVersesEl = document.getElementById('browse-verses');
+    if (browseVersesEl && browseVersesEl.innerHTML && browseVersesEl.dataset.bid) {
+      showChapterVerses(Number(browseVersesEl.dataset.bid), Number(browseVersesEl.dataset.chap));
+    }
+  });
+  const formEl = document.getElementById('search-form');
+  let ilrow = document.getElementById('il-row');
+  if (!ilrow && formEl){
+    ilrow = document.createElement('div');
+    ilrow.id = 'il-row';
+    ilrow.className = 'il-row';
+    formEl.appendChild(ilrow);
+  }
+  if (ilrow) ilrow.appendChild(btn); else {
+    const res = document.getElementById('results');
+    if (res) res.insertAdjacentElement('beforebegin', btn);
+  }
+}
+
 function renderResults(q, refs) {
-  // make sure toggle exists even if added late
+  // make sure toggles exist even if added late
   try { ensureResultsInterlinearToggle(); } catch(e){}
+  try { ensureKjvToggle(); } catch(e){}
   const el = document.getElementById('results');
   if (!el) return;
   if (!refs || !refs.length) {
@@ -232,17 +263,18 @@ function renderResults(q, refs) {
   }
   const books = state.books || [];
   const verses = state.verses || [];
-  const parts = [`<div class="muted">${refs.length} vargje</div>`];
+  const parts = [`<div class="muted">${refs.length} ${refs.length === 1 ? 'varg' : 'vargje'}</div>`];
   for (const vid of refs) {
     const row = verses[vid - 1];
     if (!row) continue;
-    const [bid, chap, ver, text] = row;
+    const [bid, chap, ver, text, kjv] = row;
     const bname = books[bid - 1] || `Libri ${bid}`;
     const inlineId = `il-inline-${vid}`;
     const slugById = BOOK_SLUGS_BY_ID[bid] || '';
     const ilBlock = state.searchInterlinearOn && slugById ? `<div class="il-inline" id="${inlineId}" data-slug="${slugById}" data-chap="${chap}" data-verse="${ver}"></div>` : '';
     const textHtml = state.searchInterlinearOn ? '' : ` - ${highlightText(sanitizeVerseText(text), q)}`;
-    parts.push(`<div class="item"><span class="ref">${bname} ${chap}:${ver}</span>${textHtml}${ilBlock}</div>`);
+    const kjvHtml = state.kjvOn && kjv ? `<div class="kjv-text">${cleanText(kjv)}</div>` : '';
+    parts.push(`<div class="item"><span class="ref">${bname} ${chap}:${ver}</span>${textHtml}${kjvHtml}${ilBlock}</div>`);
   }
   el.innerHTML = parts.join('\n');
   state.lastRefs = refs.slice(0);
@@ -349,9 +381,9 @@ function currentResultsHTML() {
   const title = (state.lastQuery||'').trim();
   return (
     `<!doctype html><meta charset="utf-8">` +
-    `<title>Rezultatet p�r ${title}</title>` +
-    `<style>@media print{body{margin:.5in}} body{font-family:system-ui,Segoe UI,Arial,sans-serif;margin:1rem} .item{margin:.3rem 0; line-height:1.6} .ref{font-weight:600} mark{background:#fff3a3}</style>` +
-    `<h1>Rezultatet p�r ${title}</h1>` +
+    `<title>Rezultatet p\u00ebr ${title}</title>` +
+    `<style>@media print{body{margin:.5in}} body{font-family:system-ui,Segoe UI,Arial,sans-serif;margin:1rem} .item{margin:.3rem 0; line-height:1.6} .ref{font-weight:600} mark{background:#fff3a3} .kjv-text{color:#555;font-style:italic;font-size:.9em;margin-top:.15rem;padding-left:1.5rem}</style>` +
+    `<h1>Rezultatet p\u00ebr ${title}</h1>` +
     (container ? container.innerHTML : '')
   );
 }
@@ -401,33 +433,87 @@ function setupUI() {
       } catch(e){}
     }
     // Ensure reference search controls exist (insert next to main search)
-    if (!document.getElementById('refq')){
+    if (!document.getElementById('ref-row')){
       try {
         const refRow = document.createElement('div');
         refRow.id = 'ref-row';
         refRow.className = 'ref-row';
-        refRow.style.display = 'flex';
-        refRow.style.gap = '.5rem';
-        refRow.style.marginTop = '.5rem';
-        refRow.style.flexBasis = '100%';
-        refRow.style.width = '100%';
 
-        const refInput = document.createElement('input');
-        refInput.type = 'text';
-        refInput.id = 'refq';
-        refInput.placeholder = 'Gjej vargun (p.sh. Isaia 6:1)';
-        refInput.autocomplete = 'off';
-        refInput.style.maxWidth = '260px';
+        const selBook = document.createElement('select');
+        selBook.id = 'ref-book';
+        selBook.innerHTML = '<option value="">— Libri —</option>';
+
+        const selChap = document.createElement('select');
+        selChap.id = 'ref-chap';
+        selChap.innerHTML = '<option value="">— Kapitulli —</option>';
+        selChap.disabled = true;
+
+        const selVerse = document.createElement('select');
+        selVerse.id = 'ref-verse';
+        selVerse.innerHTML = '<option value="">— Vargu —</option>';
+        selVerse.disabled = true;
+
         const refBtn = document.createElement('button');
         refBtn.type = 'button';
         refBtn.id = 'btn-ref';
         refBtn.textContent = 'Gjej';
-        refRow.appendChild(refInput);
+
+        refRow.appendChild(selBook);
+        refRow.appendChild(selChap);
+        refRow.appendChild(selVerse);
         refRow.appendChild(refBtn);
         const submitBtn = form.querySelector('button[type="submit"]');
         if (submitBtn) submitBtn.insertAdjacentElement('afterend', refRow);
         else form.appendChild(refRow);
-      } catch(e){}
+
+        // Populate books dropdown once data is loaded
+        Promise.all([loadBooks(), loadVerses()]).then(() => {
+          const books = state.books || [];
+          for (let i = 0; i < books.length; i++) {
+            const opt = document.createElement('option');
+            opt.value = i + 1;
+            opt.textContent = books[i];
+            selBook.appendChild(opt);
+          }
+          const chapMap = buildChaptersByBook();
+
+          selBook.addEventListener('change', () => {
+            const bid = selBook.value;
+            selChap.innerHTML = '<option value="">— Kapitulli —</option>';
+            selVerse.innerHTML = '<option value="">— Vargu —</option>';
+            selVerse.disabled = true;
+            if (!bid) { selChap.disabled = true; return; }
+            const chapters = chapMap[bid] || [];
+            for (const c of chapters) {
+              const opt = document.createElement('option');
+              opt.value = c;
+              opt.textContent = c;
+              selChap.appendChild(opt);
+            }
+            selChap.disabled = false;
+          });
+
+          selChap.addEventListener('change', () => {
+            const bid = Number(selBook.value);
+            const chap = Number(selChap.value);
+            selVerse.innerHTML = '<option value="">— Vargu —</option>';
+            if (!bid || !chap) { selVerse.disabled = true; return; }
+            const verses = state.verses || [];
+            const vNums = [];
+            for (const r of verses) {
+              if (r && r[0] === bid && r[1] === chap) vNums.push(r[2]);
+            }
+            vNums.sort((a, b) => a - b);
+            for (const v of vNums) {
+              const opt = document.createElement('option');
+              opt.value = v;
+              opt.textContent = v;
+              selVerse.appendChild(opt);
+            }
+            selVerse.disabled = false;
+          });
+        }).catch(e => console.error('Failed to load ref dropdowns:', e));
+      } catch(e){ console.error('ref-row setup error:', e); }
     }
     form.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -437,21 +523,34 @@ function setupUI() {
     });
   }
 
-  // Reference search: parse e.g., "Isaia 6:1" (Albanian names)
+  // Reference search: use dropdown selections
   const btnRef = document.getElementById('btn-ref');
-  const refInput = document.getElementById('refq');
-  if (btnRef && refInput){
+  if (btnRef){
     const doRefSearch = () => {
-      const s = (refInput.value||'').trim();
-      if (!s) return;
-      findAndRenderReference(s);
+      const selBook = document.getElementById('ref-book');
+      const selChap = document.getElementById('ref-chap');
+      const selVerse = document.getElementById('ref-verse');
+      const bid = Number(selBook?.value);
+      const chap = Number(selChap?.value);
+      const verse = Number(selVerse?.value);
+      if (!bid || !chap) { showStatus('Zgjidh librin dhe kapitullin.'); return; }
+      if (!verse) {
+        // No verse selected: show whole chapter
+        showChapterVerses(bid, chap);
+        document.getElementById('search').scrollIntoView({behavior:'smooth'});
+        return;
+      }
+      const vid = findVerseId(bid, chap, verse);
+      if (!vid){ showStatus('Vargu nuk u gjet.'); return; }
+      showStatus('');
+      renderResults('', [vid]);
     };
     btnRef.addEventListener('click', doRefSearch);
-    refInput.addEventListener('keydown', (ev) => { if (ev.key === 'Enter'){ ev.preventDefault(); doRefSearch(); } });
   }
 
-  // Add Interlinear toggle for search results
+  // Add Interlinear and KJV toggles
   try { ensureResultsInterlinearToggle(); } catch(e){}
+  try { ensureKjvToggle(); } catch(e){}
   const btnPrint = document.getElementById('btn-print');
   if (btnPrint) btnPrint.addEventListener('click', () => window.print());
   const btnDl = document.getElementById('btn-download');
@@ -580,16 +679,31 @@ function showChapterVerses(bid, chap) {
   const books = state.books || [];
   const verses = state.verses || [];
   const versesEl = document.getElementById('browse-verses');
+  versesEl.dataset.bid = bid;
+  versesEl.dataset.chap = chap;
   const items = [];
   for (let i = 0; i < verses.length; i++) {
     const row = verses[i];
     if (!row) continue;
-    const [b, c, v, text] = row;
+    const [b, c, v, text, kjv] = row;
     if (b === bid && c === chap) {
-      items.push(`<div class="item"><span class="ref">${books[bid - 1]} ${chap}:${v}</span> <button class="copy-btn copy-src" style="margin-left:.5rem" data-bid="${bid}" data-chap="${chap}" data-verse="${v}" title="Kopjo interlinear"><svg class="copy-ic" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v12h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14h14c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button> <button class="copy-btn copy-sq" style="margin-left:.35rem" title="Kopjo (Shqip)"><svg class="copy-ic" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v12h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14h14c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button> - <span class="sqtext">${cleanText(text)}</span></div>`);
+      const kjvHtml = state.kjvOn && kjv ? `<div class="kjv-text">${cleanText(kjv)}</div>` : '';
+      items.push(`<div class="item"><span class="ref">${books[bid - 1]} ${chap}:${v}</span> <button class="copy-btn copy-src" style="margin-left:.5rem" data-bid="${bid}" data-chap="${chap}" data-verse="${v}" title="Kopjo interlinear"><svg class="copy-ic" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v12h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14h14c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button> <button class="copy-btn copy-sq" style="margin-left:.35rem" title="Kopjo (Shqip)"><svg class="copy-ic" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v12h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14h14c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button> - <span class="sqtext">${cleanText(text)}</span>${kjvHtml}</div>`);
     }
   }
-  versesEl.innerHTML = items.length ? items.join('\n') : '<p class="muted">Nuk ka vargje.</p>';
+  // Add KJV toggle for browse view
+  const kjvBrowseToggle = `<button type="button" id="btn-kjv-browse" style="margin-bottom:.5rem">${state.kjvOn ? 'Mbylle KJV' : 'Shiko KJV'}</button>`;
+  versesEl.innerHTML = (items.length ? kjvBrowseToggle + items.join('\n') : '<p class="muted">Nuk ka vargje.</p>');
+  const kjvBrowseBtn = document.getElementById('btn-kjv-browse');
+  if (kjvBrowseBtn) {
+    kjvBrowseBtn.addEventListener('click', () => {
+      state.kjvOn = !state.kjvOn;
+      // Also sync the search KJV toggle if it exists
+      const searchKjvBtn = document.getElementById('btn-kjv-toggle');
+      if (searchKjvBtn) searchKjvBtn.textContent = state.kjvOn ? 'Mbylle KJV' : 'Shiko KJV';
+      showChapterVerses(bid, chap);
+    });
+  }
 
   // Wire copy buttons to fetch interlinear and copy consonants/stripped text
   try {
