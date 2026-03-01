@@ -24,7 +24,7 @@ nav a:hover{ text-decoration:underline }
 .form-actions{ display:flex; gap:.5rem; margin-top:.5rem; width:100% }
 .search-3col input[type="text"]{ flex:1; }
 .ref-row{ display:flex; gap:.5rem; margin-top:.5rem; flex-basis:100%; width:100%; flex-wrap:nowrap; align-items:center }
-.ref-row select{ height:42px; padding:0 .5rem; font-size:.95rem; border:1px solid #e6e9ef; border-radius:8px; background:#fff; box-shadow:inset 0 1px 2px rgba(10,20,40,.05); appearance:auto; color:var(--fg); min-width:0; }
+.ref-row select{ height:42px; padding:0 .5rem; font-size:1rem; font-family:inherit; border:1px solid #e6e9ef; border-radius:8px; background:#fff; box-shadow:inset 0 1px 2px rgba(10,20,40,.05); appearance:auto; color:var(--fg); min-width:0; }
 #ref-book{ flex:1 1 auto; max-width:180px; }
 #ref-chap{ flex:0 0 auto; width:90px; }
 #ref-verse{ flex:0 0 auto; width:80px; }
