@@ -40,7 +40,7 @@ jobs:
 
       - name: Build SQLite DB
         run: |
-          python scripts/build_concordance.py build --sql Alb.sql.txt --db alb_concordance.sqlite
+          python scripts/build_concordance.py build --sql Alb.sql.txt --db alb_concordance.sqlite --kjv KJV.sql.txt
 
       - name: Build site data
         run: |
